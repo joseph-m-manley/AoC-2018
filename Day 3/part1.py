@@ -40,9 +40,6 @@ class Claim():
         if not self.overlaps(other):
             return set()
 
-        self.did_overlap = True
-        other.did_overlap = True
-
         left = max(self.left, other.left)
         right = min(self.right, other.right)
         top = max(self.top, other.top)
@@ -60,15 +57,18 @@ def find_overlapping_claims():
         claim = claims.pop()
 
         for other in claims:
-            points = claim.try_get_overlapping_points(other)
-            overlapping_points.update(points)
+            if claim.overlaps(other):
+                points = claim.try_get_overlapping_points(other)
+                overlapping_points.update(points)
+                claim.did_overlap = True
+                other.did_overlap = True
 
         visited.append(claim)
 
     print('Total overlapping area: {0} sqin'.format(len(overlapping_points)))
 
     no_overlap = list(filter(lambda x: not x.did_overlap, visited))
-    print(no_overlap)
+    print('Non-overlapping claims: {0}'.format([ claim.id for claim in no_overlap ]))
 
 if __name__ == '__main__':
     find_overlapping_claims()
